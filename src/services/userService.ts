@@ -9,6 +9,10 @@ export const getUsers = async (
   const result = await pool.query("SELECT * FROM users LIMIT $1 OFFSET $2", [limit, offset]);
   return result.rows;
 };
+export const userExists = async (email: string, pool: Pool) => {
+  const result = await pool.query("SELECT * FROM users where email = $1", [email]);
+  return result.rows;
+}
 
 export const createUser = async (email: string, name: string, pool: Pool) => {
   const result = await pool.query(
