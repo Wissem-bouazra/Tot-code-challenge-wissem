@@ -50,6 +50,5 @@ reservationRouter.get("/", async (req: Request, res: Response) => {
       req.query.offset as string,
       pool
     );
-  
     return res.status(200).json(reservations);
 });

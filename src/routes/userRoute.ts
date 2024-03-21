@@ -7,4 +7,4 @@ export const userRouter = express.Router()
 userRouter.get("/", async (_: Request, res: Response) => {
     const users = await getUsers(pool);
     return res.status(200).json(users);
-  });
+});
