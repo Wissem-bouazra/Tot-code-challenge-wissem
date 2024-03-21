@@ -22,7 +22,6 @@ reservationRouter.post("/create", async (req: Request, res: Response) => {
       })
     })
     const reservation = data.parse(req.body)
-    // const { name, email, startTime, endTime } = req.body;
     const start = new Date(reservation.startTime)
     const end = addHours(start, 1)
     if (start.getHours() >= 19 && start.getHours() <= 23) {
