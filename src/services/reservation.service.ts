@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { reservation } from "../moodels/reservation.model";
 
 
 export const getReservationsByRange = async (
@@ -8,21 +9,17 @@ export const getReservationsByRange = async (
   offset: string = "0",
   pool: Pool
 ) => {
-  const result =
-    startTime && endTime
-      ? await pool.query(
+  const result = startTime && endTime ? await pool.query<reservation>(
           "SELECT * FROM reservations where startTime >= $1 and endTime <= $2 LIMIT $3 OFFSET $4",
           [startTime, endTime, limit, offset]
-        )
-      : await pool.query("SELECT * FROM reservations LIMIT $1 OFFSET $2", [
-          limit,
-          offset,
-        ]);
+        ) : await pool.query<reservation>(
+          "SELECT * FROM reservations LIMIT $1 OFFSET $2", [limit, offset,]
+        );
   return result.rows;
 };
 
 export const getReservationsByTime = async (startTime: string, pool: Pool) => {
-  const result = await pool.query(
+  const result = await pool.query<reservation>(
     "SELECT * FROM reservations where startTime = $1",
     [startTime]
   );
@@ -35,7 +32,7 @@ export const createReservation = async (
   endTime: string,
   pool: Pool
 ) => {
-  const result = await pool.query(
+  const result = await pool.query<reservation>(
     "INSERT INTO reservations (userEmail, startTime, endTime) VALUES ($1, $2, $3) RETURNING *",
     [email, startTime, endTime]
   );

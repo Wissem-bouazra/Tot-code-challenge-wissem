@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { getUsers } from "../services/userService";
+import { getUsers } from "../services/user.service";
 import { pool } from "..";
 
 export const userRouter = express.Router()

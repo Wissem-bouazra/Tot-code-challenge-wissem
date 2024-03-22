@@ -3,6 +3,8 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import { router } from "./routes/router";
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './openapi.json'; // Path to your OpenAPI Specification file
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ export const pool = new Pool({
 });
 
 const app: Express = express();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());

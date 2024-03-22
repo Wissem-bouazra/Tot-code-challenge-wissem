@@ -1,6 +1,6 @@
 import express from "express";
-import { userRouter } from "./userRoute";
-import { reservationRouter } from "./reservationRoute";
+import { userRouter } from "./user.route";
+import { reservationRouter } from "./reservation.route";
 
 
 
