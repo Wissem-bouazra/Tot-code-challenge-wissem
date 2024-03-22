@@ -18,10 +18,10 @@ export const getReservationsByRange = async (
   return result.rows;
 };
 
-export const getReservationsByTime = async (startTime: string, pool: Pool) => {
+export const getReservationsByTime = async (startTime: string, userEmail:string, pool: Pool) => {
   const result = await pool.query<reservation>(
-    "SELECT * FROM reservations where startTime = $1",
-    [startTime]
+    "SELECT * FROM reservations where startTime = $1 AND userEmail = $2",
+    [startTime,userEmail]
   );
   return result.rows;
 };

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { pool } from "..";
 import { NUMBER_OF_TABLES } from "../constants";
-import { createReservation, getReservationsByRange, getSpotsAvailable } from "../services/reservation.service";
+import { createReservation, getReservationsByRange, getReservationsByTime, getSpotsAvailable } from "../services/reservation.service";
 import { createUser, userExists } from "../services/user.service";
 import express, { Request, Response } from "express";
 import { addHours } from 'date-fns';
@@ -26,6 +26,7 @@ reservationRouter.post("/create", async (req: Request, res: Response) => {
     const start = new Date(reservation.startTime)
     const end = addHours(start, 1)
     if (start.getHours() >= 19 && start.getHours() <= 23) {
+      const currentReservations = await getReservationsByTime(start.toISOString(), reservation.email, pool);
       const totalSpots = await getSpotsAvailable(start.toISOString(), pool)
       const spotsAvailable =  (NUMBER_OF_TABLES - (Math.round(totalSpots[0].total / 4)))
       if (spotsAvailable > 0 && spotsAvailable < 6) {
@@ -35,11 +36,15 @@ reservationRouter.post("/create", async (req: Request, res: Response) => {
           return res.status(200).json({
               message: "Reservation created successfully",
           });
-        }
+        } else if (currentReservations.length === 0) {
         await createReservation(reservation.email, start.toISOString(), end.toISOString(), reservation.numberOfSpots, pool);
           return res.status(200).json({
               message: "Thank you for choosing our restaurent again",
           });
+        }
+        return res.status(200).json({
+          message: "User already has a reservation at this time",
+        });
       }
       return res.json({
       message: "Restaurent is fully booked, reservation unsuccessful",
