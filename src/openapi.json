@@ -1,52 +1,228 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "Sample API",
-      "version": "1.0.0"
-    },
-    "paths": {
-      "/users": {
-        "get": {
-          "summary": "Get all users",
-          "responses": {
-            "200": {
-              "description": "A list of users"
-            }
-          }
-        },
-        "post": {
-          "summary": "Create a new user",
-          "requestBody": {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Reservation application",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "responses": {
+          "200": {
+            "description": "A list of users",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 }
               }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "User created successfully"
             }
           }
         }
       }
     },
-    "components": {
-      "schemas": {
-        "User": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
+    "/reservations/create": {
+      "post": {
+        "summary": "Create a new reservation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the person making the reservation",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email address of the person making the reservation",
+                    "example": "johndoe@example.com"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Start time of the reservation",
+                    "example": "2024-03-22T19:00:00Z"
+                  },
+                  "numberOfSpots": {
+                    "type": "integer",
+                    "description": "Number of spots required for the reservation",
+                    "example": 4
+                  }
+                },
+                "required": ["name", "email", "startTime", "numberOfSpots"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful reservation creation",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Reservation created successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required fields",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid request body or missing required fields"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - user already has a reservation at the same time",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User already has a reservation at this time"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Restaurant fully booked or closed at the requested time",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Restaurant is fully booked or closed at this time"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservations": {
+      "get": {
+        "summary": "Get reservations by range",
+        "parameters": [
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": true,
+            "description": "Start time for filtering reservations",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-03-22T19:00:00Z"
+
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "description": "End time for filtering reservations",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-03-22T19:00:00Z"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Limit the number of results (default: 10)",
+            "schema": {
+              "type": "number",
+              "example":3
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset for paginated results (default: 0)",
+            "schema": {
+              "type": "number",
+              "example":0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with reservations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reservation"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required fields",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid request parameters or missing required fields"
+                }
+              }
             }
           }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "Reservation":{
+        "type":"object",
+        "properties": {
+          "userEmail": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "example":"2024-03-22T19:00:00Z"
+          },
+          "endTime": {
+            "type": "string",
+            "example":"2024-03-22T19:00:00Z"
+          },
+          "numberOfSpots":{
+            "type":"number"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
   }
-  
+}

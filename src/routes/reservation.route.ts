@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { pool } from "..";
 import { NUMBER_OF_TABLES } from "../constants";
-import { createReservation, getReservationsByRange, getReservationsByTime, getSpotsAvailable } from "../services/reservation.service";
+import { createReservation, getReservationsByRange, getSpotsAvailable } from "../services/reservation.service";
 import { createUser, userExists } from "../services/user.service";
 import express, { Request, Response } from "express";
 import { addHours } from 'date-fns';
@@ -26,9 +26,9 @@ reservationRouter.post("/create", async (req: Request, res: Response) => {
     const start = new Date(reservation.startTime)
     const end = addHours(start, 1)
     if (start.getHours() >= 19 && start.getHours() <= 23) {
-      const currentReservations = await getReservationsByTime(start.toISOString(), pool);
-      const spotsAvailable =  NUMBER_OF_TABLES - (currentReservations.reduce( (a, b) => a + b.numberOfSpots, 0) / NUMBER_OF_TABLES)
-      if (currentReservations.length < spotsAvailable) {
+      const totalSpots = await getSpotsAvailable(start.toISOString(), pool)
+      const spotsAvailable =  (NUMBER_OF_TABLES - (Math.round(totalSpots[0].total / 4)))
+      if (spotsAvailable > 0 && spotsAvailable < 6) {
         if((await userExists(reservation.email, pool)).length === 0) {
           await createUser(reservation.email, reservation.name, pool);
           await createReservation(reservation.email, start.toISOString(), end.toISOString(), reservation.numberOfSpots, pool);

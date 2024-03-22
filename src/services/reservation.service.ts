@@ -28,7 +28,7 @@ export const getReservationsByTime = async (startTime: string, pool: Pool) => {
 
 export const getSpotsAvailable = async (startTime: string, pool: Pool) => {
   const result = await pool.query(
-    "SELECT COUNT(numberOfSpots) FROM reservations where startTime = $1",
+    "SELECT SUM(numberOfSpots) as total FROM reservations where startTime = $1",
     [startTime]
   );
   return result.rows;
