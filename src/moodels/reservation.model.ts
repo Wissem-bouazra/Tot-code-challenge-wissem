@@ -1,5 +1,8 @@
 export type reservation = {
     userEmail: string,
     startTime: string,
-    endTime: string
+    endTime: string,
+    numberOfSpots: number
 }
+
+export type numberOfSpots = number

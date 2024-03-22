@@ -26,15 +26,24 @@ export const getReservationsByTime = async (startTime: string, pool: Pool) => {
   return result.rows;
 };
 
+export const getSpotsAvailable = async (startTime: string, pool: Pool) => {
+  const result = await pool.query(
+    "SELECT COUNT(numberOfSpots) FROM reservations where startTime = $1",
+    [startTime]
+  );
+  return result.rows;
+};
+
 export const createReservation = async (
   email: string,
   startTime: string,
   endTime: string,
+  numberOfSpots: number,
   pool: Pool
 ) => {
   const result = await pool.query<reservation>(
-    "INSERT INTO reservations (userEmail, startTime, endTime) VALUES ($1, $2, $3) RETURNING *",
-    [email, startTime, endTime]
+    "INSERT INTO reservations (userEmail, startTime, endTime, numberOfSpots) VALUES ($1, $2, $3, $4) RETURNING *",
+    [email, startTime, endTime, numberOfSpots]
   );
 
   return result.rows[0];
