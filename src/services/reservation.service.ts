@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { reservation } from "../moodels/reservation.model";
+import { reservation } from "../models/reservation.model";
 
 
 export const getReservationsByRange = async (

@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { user } from "../moodels/user.model";
+import { user } from "../models/user.model";
 
 
 export const getUsers = async (
